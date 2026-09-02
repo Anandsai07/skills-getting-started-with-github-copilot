@@ -38,6 +38,12 @@ activities = {
         "schedule": "Mondays, Wednesdays, Fridays, 2:00 PM - 3:00 PM",
         "max_participants": 30,
         "participants": ["john@mergington.edu", "olivia@mergington.edu"]
+    },
+    "Drama Club": {
+        "description": "Learn acting, stage performance, and theater production",
+        "schedule": "Mondays and Wednesdays, 4:00 PM - 5:30 PM",
+        "max_participants": 25,
+        "participants": ["john@mergington.edu", "olivia@mergington.edu"]
     }
 }
 
