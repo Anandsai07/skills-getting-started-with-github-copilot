@@ -24,16 +24,20 @@ activityCard.dataset.activityName = name;
         const spotsLeft = details.max_participants - details.participants.length;
 
         activityCard.innerHTML = `
-          <h4>${name}</h4>
-          <p>${details.description}</p>
-          <p><strong>Schedule:</strong> ${details.schedule}</p>
-          <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
-          <ul class="participants-list">
-  ${details.participants
-    .map((participant) => `<li>${participant}</li>`)
-    .join("")}
-</ul>
-        `;
+  <h4>${name}</h4>
+  <p>${details.description}</p>
+  <p><strong>Schedule:</strong> ${details.schedule}</p>
+  <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
+
+  <div class="participants">
+    <strong>Participants:</strong>
+    <ul>
+      ${details.participants
+        .map((participant) => `<li>${participant}</li>`)
+        .join("")}
+    </ul>
+  </div>
+`;
 
         activitiesList.appendChild(activityCard);
 
