@@ -14,11 +14,14 @@ document.addEventListener("DOMContentLoaded", () => {
       activitiesList.innerHTML = "";
       activitySelect.innerHTML =
   '<option value="">-- Select an activity --</option>';
+      activitySelect.innerHTML =
+  '<option value="">-- Select an activity --</option>';
 
       // Populate activities list
       Object.entries(activities).forEach(([name, details]) => {
-        const activityCard = document.createElement("div");
+       const activityCard = document.createElement("div");
 activityCard.className = "activity-card";
+activityCard.dataset.activityName = name;
 activityCard.dataset.activityName = name;
 
         const spotsLeft = details.max_participants - details.participants.length;
@@ -31,9 +34,25 @@ activityCard.dataset.activityName = name;
 
   <div class="participants">
     <strong>Participants:</strong>
-    <ul>
+    <ul class="participants-list">
       ${details.participants
-        .map((participant) => `<li>${participant}</li>`)
+        .map(
+          (participant) => `
+            <li>
+              <span>${participant}</span>
+              <button
+                type="button"
+                class="delete-participant"
+                data-activity="${name}"
+                data-email="${participant}"
+                title="Remove participant"
+                aria-label="Remove ${participant}"
+              >
+                🗑️
+              </button>
+            </li>
+          `
+        )
         .join("")}
     </ul>
   </div>
@@ -52,6 +71,27 @@ activityCard.dataset.activityName = name;
       console.error("Error fetching activities:", error);
     }
   }
+  activitiesList.addEventListener("click", async (event) => {
+  const deleteButton = event.target.closest(".delete-participant");
+
+  if (!deleteButton) {
+    return;
+  }
+
+  const activity = deleteButton.dataset.activity;
+  const email = deleteButton.dataset.email;
+
+  const response = await fetch(
+    `/activities/${encodeURIComponent(activity)}/signup?email=${encodeURIComponent(email)}`,
+    {
+      method: "DELETE",
+    }
+  );
+
+  if (response.ok) {
+    fetchActivities();
+  }
+});
 
   // Handle form submission
   signupForm.addEventListener("submit", async (event) => {
