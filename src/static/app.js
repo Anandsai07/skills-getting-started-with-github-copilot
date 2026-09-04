@@ -7,15 +7,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // Function to fetch activities from API
   async function fetchActivities() {
     try {
-      const response = await fetch("/activities");
+      const response = await fetch("/activities", { cache: "no-store" });
       const activities = await response.json();
 
       // Clear loading message
       activitiesList.innerHTML = "";
-      activitySelect.innerHTML =
-  '<option value="">-- Select an activity --</option>';
-      activitySelect.innerHTML =
-  '<option value="">-- Select an activity --</option>';
+      activitySelect.innerHTML = '<option value="">-- Select an activity --</option>';
 
       // Populate activities list
       Object.entries(activities).forEach(([name, details]) => {
@@ -27,36 +24,25 @@ activityCard.dataset.activityName = name;
         const spotsLeft = details.max_participants - details.participants.length;
 
         activityCard.innerHTML = `
-  <h4>${name}</h4>
-  <p>${details.description}</p>
-  <p><strong>Schedule:</strong> ${details.schedule}</p>
-  <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
-
-  <div class="participants">
-    <strong>Participants:</strong>
-    <ul class="participants-list">
-      ${details.participants
-        .map(
-          (participant) => `
-            <li>
-              <span>${participant}</span>
-              <button
-                type="button"
-                class="delete-participant"
-                data-activity="${name}"
-                data-email="${participant}"
-                title="Remove participant"
-                aria-label="Remove ${participant}"
-              >
-                🗑️
-              </button>
-            </li>
-          `
-        )
-        .join("")}
-    </ul>
-  </div>
-`;
+          <h4>${name}</h4>
+          <p>${details.description}</p>
+          <p><strong>Schedule:</strong> ${details.schedule}</p>
+          <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
+          <div class="participants-section">
+            <h5>Participants</h5>
+            <ul class="participants-list" aria-live="polite">
+              ${details.participants
+                .map(
+                  (participant) => `
+                    <li>
+                      <span>${participant}</span>
+                      <button class="remove-participant" type="button" data-activity="${name}" data-email="${participant}" aria-label="Remove ${participant}" title="Remove participant">&#128465;</button>
+                    </li>`
+                )
+                .join("")}
+            </ul>
+          </div>
+        `;
 
         activitiesList.appendChild(activityCard);
 
@@ -111,15 +97,14 @@ activityCard.dataset.activityName = name;
       const result = await response.json();
 
       if (response.ok) {
-  messageDiv.textContent = result.message;
-  messageDiv.className = "success";
-  signupForm.reset();
-
-  await fetchActivities();
-} else {
-  messageDiv.textContent = result.detail || "An error occurred";
-  messageDiv.className = "error";
-}
+        messageDiv.textContent = result.message;
+        messageDiv.className = "success";
+        signupForm.reset();
+        await fetchActivities();
+      } else {
+        messageDiv.textContent = result.detail || "An error occurred";
+        messageDiv.className = "error";
+      }
 
       messageDiv.classList.remove("hidden");
 
@@ -132,6 +117,35 @@ activityCard.dataset.activityName = name;
       messageDiv.className = "error";
       messageDiv.classList.remove("hidden");
       console.error("Error signing up:", error);
+    }
+  });
+
+  activitiesList.addEventListener("click", async (event) => {
+    const removeButton = event.target.closest(".remove-participant");
+    if (!removeButton) return;
+
+    removeButton.disabled = true;
+    const activity = removeButton.dataset.activity;
+    const email = removeButton.dataset.email;
+
+    try {
+      const response = await fetch(
+        `/activities/${encodeURIComponent(activity)}/signup?email=${encodeURIComponent(email)}`,
+        { method: "DELETE" }
+      );
+
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(result.detail || "Unable to remove participant");
+      }
+
+      await fetchActivities();
+    } catch (error) {
+      removeButton.disabled = false;
+      messageDiv.textContent = error.message;
+      messageDiv.className = "error";
+      messageDiv.classList.remove("hidden");
+      console.error("Error removing participant:", error);
     }
   });
 
