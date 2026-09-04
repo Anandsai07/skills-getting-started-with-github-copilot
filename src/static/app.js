@@ -16,8 +16,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Populate activities list
       Object.entries(activities).forEach(([name, details]) => {
-        const activityCard = document.createElement("div");
-        activityCard.className = "activity-card";
+       const activityCard = document.createElement("div");
+activityCard.className = "activity-card";
+activityCard.dataset.activityName = name;
+activityCard.dataset.activityName = name;
 
         const spotsLeft = details.max_participants - details.participants.length;
 
@@ -55,6 +57,27 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Error fetching activities:", error);
     }
   }
+  activitiesList.addEventListener("click", async (event) => {
+  const deleteButton = event.target.closest(".delete-participant");
+
+  if (!deleteButton) {
+    return;
+  }
+
+  const activity = deleteButton.dataset.activity;
+  const email = deleteButton.dataset.email;
+
+  const response = await fetch(
+    `/activities/${encodeURIComponent(activity)}/signup?email=${encodeURIComponent(email)}`,
+    {
+      method: "DELETE",
+    }
+  );
+
+  if (response.ok) {
+    fetchActivities();
+  }
+});
 
   // Handle form submission
   signupForm.addEventListener("submit", async (event) => {
