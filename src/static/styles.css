@@ -89,6 +89,7 @@ section h3 {
 
 .participants-list {
   list-style: none;
+  overflow-wrap: anywhere;
   color: #536174;
   font-size: 0.95rem;
 }
