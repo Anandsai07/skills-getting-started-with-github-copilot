@@ -94,14 +94,11 @@ section h3 {
 }
 
 .participants-list li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
   padding: 2px 0;
 }
 
 .remove-participant {
+  float: right;
   flex: 0 0 28px;
   width: 28px;
   height: 28px;

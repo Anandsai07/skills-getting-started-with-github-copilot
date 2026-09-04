@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Function to fetch activities from API
   async function fetchActivities() {
     try {
-      const response = await fetch("/activities");
+      const response = await fetch("/activities", { cache: "no-store" });
       const activities = await response.json();
 
       // Clear loading message
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   (participant) => `
                     <li>
                       <span>${participant}</span>
-                      <button class="remove-participant" type="button" data-activity="${name}" data-email="${participant}" aria-label="Remove ${participant}" title="Remove participant">&times;</button>
+                      <button class="remove-participant" type="button" data-activity="${name}" data-email="${participant}" aria-label="Remove ${participant}" title="Remove participant">&#128465;</button>
                     </li>`
                 )
                 .join("")}
